@@ -1,0 +1,63 @@
+﻿<Window x:Class="FileRenamer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewmodel="clr-namespace:FileRenamer.Viewmodels"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="File Modifier" Height="450" Width="700">
+    <Window.DataContext>
+        <viewmodel:MainViewModel />
+    </Window.DataContext>
+    <DockPanel Margin="16">
+        <DockPanel.Resources>
+            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                <Setter Property="FontSize" Value="9pt" />
+                <Setter Property="md:ButtonAssist.CornerRadius" Value="0" />
+                <Setter Property="md:ShadowAssist.ShadowDepth" Value="1" />
+            </Style>
+            <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
+                <Setter Property="BorderBrush" Value="{StaticResource TextColor}"/>
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Padding" Value="4,8" />
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="FontSize" Value="10pt" />
+            </Style>
+        </DockPanel.Resources>
+        
+        <!-- Target directory selection component -->
+        <DockPanel DockPanel.Dock="Top">
+            <Button DockPanel.Dock="Right"
+                    VerticalAlignment="Center"
+                    Margin="8,0,0,0"
+                    Command="{Binding FindTargetDirectoryCommand}"
+                    Content="탐색.."/>
+            <TextBox md:HintAssist.Hint="대상 폴더 위치..."/>
+        </DockPanel>
+
+        <!-- Footer buttons -->
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom"
+                    HorizontalAlignment="Right">
+            <Button Command="{Binding FFMpegCommand}"
+                    Content="FFMpeg" />
+            <Button Command="{Binding RenameCommand}"
+                    Margin="8,0,0,0"
+                    Content="이름 변경"/>
+        </StackPanel>
+        
+        <!-- Regex input form -->
+        <StackPanel DockPanel.Dock="Bottom">
+            <TextBox Margin="0,0,0,8" 
+                     md:HintAssist.Hint="대상 파일명 정규식..."/>
+            <TextBox Margin="0,0,0,8"
+                     md:HintAssist.Hint="바꿀 파일명 정규식..."/>
+        </StackPanel>
+
+        <!-- Preview of replacements -->
+        <ListBox Margin="0,8"
+                 BorderBrush="{StaticResource TextColor}"
+                 BorderThickness="1"/>
+    </DockPanel>
+</Window>
