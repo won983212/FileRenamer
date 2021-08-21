@@ -34,7 +34,9 @@
                     Margin="8,0,0,0"
                     Command="{Binding FindTargetDirectoryCommand}"
                     Content="탐색.."/>
-            <TextBox md:HintAssist.Hint="대상 폴더 위치..."/>
+            <TextBox Text="{Binding TargetDirectory}"
+                     IsReadOnly="True"
+                     md:HintAssist.Hint="대상 폴더 위치..."/>
         </DockPanel>
 
         <!-- Footer buttons -->
@@ -50,14 +52,57 @@
         <!-- Regex input form -->
         <StackPanel DockPanel.Dock="Bottom">
             <TextBox Margin="0,0,0,8" 
+                     Text="{Binding TargetRegex}"
                      md:HintAssist.Hint="대상 파일명 정규식..."/>
             <TextBox Margin="0,0,0,8"
+                     Text="{Binding ReplacementRegex}"
                      md:HintAssist.Hint="바꿀 파일명 정규식..."/>
         </StackPanel>
 
         <!-- Preview of replacements -->
         <ListBox Margin="0,8"
                  BorderBrush="{StaticResource TextColor}"
-                 BorderThickness="1"/>
+                 BorderThickness="1"
+                 ItemsSource="{Binding Files}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel>
+                        <md:PackIcon DockPanel.Dock="Left"
+                                     VerticalAlignment="Center"
+                                     Width="24" Height="24"
+                                     Margin="0,0,8,0"
+                                     Kind="{Binding TypeIcon}" />
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock FontWeight="Bold"
+                                       Text="{Binding ReplacedName}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource HeaderTextColor}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsReplaced}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource ErrorColor}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBlock Foreground="{StaticResource LightTextColor}" 
+                                       Text="{Binding OriginalName}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsReplaced}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </DockPanel>
 </Window>

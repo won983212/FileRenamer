@@ -3,11 +3,10 @@
     <SolidColorBrush x:Key="Primary" Color="#3F51B5" />
     <SolidColorBrush x:Key="PrimaryContent" Color="#ffffff" />
 
+    <SolidColorBrush x:Key="LightTextColor" Color="#c0c0c0" />
     <SolidColorBrush x:Key="TextColor" Color="#707070" />
     <SolidColorBrush x:Key="HeaderTextColor" Color="#000000" />
 
-    <SolidColorBrush x:Key="CardColor" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="DarkCardColor" Color="#202020" />
     <SolidColorBrush x:Key="BackgroundColor" Color="#eeeeee" />
     <SolidColorBrush x:Key="BorderColor" Color="#dfdfdf" />
 
