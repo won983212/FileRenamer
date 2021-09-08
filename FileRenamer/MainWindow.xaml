@@ -4,105 +4,148 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodel="clr-namespace:FileRenamer.Viewmodels"
+        xmlns:validation="clr-namespace:FileRenamer.Validations"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="File Modifier" Height="450" Width="700">
+        Title="File Modifier" Height="600" Width="700">
     <Window.DataContext>
         <viewmodel:MainViewModel />
     </Window.DataContext>
-    <DockPanel Margin="16">
-        <DockPanel.Resources>
-            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
-                <Setter Property="FontSize" Value="9pt" />
-                <Setter Property="md:ButtonAssist.CornerRadius" Value="0" />
-                <Setter Property="md:ShadowAssist.ShadowDepth" Value="1" />
-            </Style>
-            <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
-                <Setter Property="BorderBrush" Value="{StaticResource TextColor}"/>
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="Padding" Value="4,8" />
-            </Style>
-            <Style TargetType="TextBlock">
-                <Setter Property="FontSize" Value="10pt" />
-            </Style>
-        </DockPanel.Resources>
-        
-        <!-- Target directory selection component -->
-        <DockPanel DockPanel.Dock="Top">
-            <Button DockPanel.Dock="Right"
-                    VerticalAlignment="Center"
-                    Margin="8,0,0,0"
-                    Command="{Binding FindTargetDirectoryCommand}"
-                    Content="탐색.."/>
-            <TextBox Text="{Binding TargetDirectory}"
-                     IsReadOnly="True"
-                     md:HintAssist.Hint="대상 폴더 위치..."/>
+    <md:DialogHost Style="{StaticResource MaterialDesignEmbeddedDialogHost}"
+                   Identifier="RootDialogHost"
+                   DialogTheme="Inherit">
+        <DockPanel Margin="16">
+            <DockPanel.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                    <Setter Property="FontSize" Value="9pt" />
+                    <Setter Property="md:ButtonAssist.CornerRadius" Value="0" />
+                    <Setter Property="md:ShadowAssist.ShadowDepth" Value="Depth1" />
+                </Style>
+                <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
+                    <Setter Property="BorderBrush" Value="{StaticResource TextColor}"/>
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="Padding" Value="4,8" />
+                    <Setter Property="md:ValidationAssist.Suppress" Value="True" />
+                    <Style.Triggers>
+                        <Trigger Property="Validation.HasError" Value="true">
+                            <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="10pt" />
+                </Style>
+            </DockPanel.Resources>
+
+            <!-- Target directory selection component -->
+            <DockPanel DockPanel.Dock="Top">
+                <Button DockPanel.Dock="Right"
+                        VerticalAlignment="Center"
+                        Margin="8,0,0,0"
+                        Command="{Binding FindTargetDirectoryCommand}"
+                        Content="탐색.."/>
+                <TextBox Text="{Binding TargetDirectory}"
+                         IsReadOnly="True"
+                         md:HintAssist.Hint="대상 폴더 위치..."/>
+            </DockPanel>
+
+            <!-- Footer buttons -->
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom"
+                        HorizontalAlignment="Right">
+                <Button Command="{Binding FFMpegCommand}"
+                        Content="FFMpeg">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CanUseFFMpeg}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Command="{Binding RenameCommand}"
+                        Margin="8,0,0,0"
+                        Content="이름 변경"/>
+            </StackPanel>
+
+            <!-- Regex input form -->
+            <StackPanel DockPanel.Dock="Bottom">
+                <TextBox Margin="0,0,0,8" 
+                         md:HintAssist.Hint="대상 파일명 정규식...">
+                    <TextBox.Text>
+                        <Binding Path="TargetRegex"
+                                 UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <validation:RegexValidationRule CheckReplacementRegex="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <DockPanel Margin="0,0,0,16">
+                    <Button DockPanel.Dock="Right"
+                            Margin="8,0,0,0"
+                            Command="{Binding ShowExtendedReplRegexCommand}"
+                            Content="확장문법 보기" />
+                    <TextBox md:HintAssist.Hint="바꿀 파일명 정규식...">
+                        <TextBox.Text>
+                            <Binding Path="ReplacementRegex"
+                                 UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <validation:RegexValidationRule />
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                </DockPanel>
+            </StackPanel>
+
+            <!-- Preview of replacements -->
+            <ListBox Margin="0,8"
+                     BorderBrush="{StaticResource TextColor}"
+                     BorderThickness="1"
+                     ItemsSource="{Binding Files}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <md:PackIcon DockPanel.Dock="Left"
+                                         VerticalAlignment="Center"
+                                         Width="24" Height="24"
+                                         Margin="0,0,8,0"
+                                         Kind="{Binding TypeIcon}" />
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock FontWeight="Bold"
+                                           Text="{Binding ReplacedName}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{StaticResource HeaderTextColor}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter Property="Foreground" Value="{StaticResource ErrorColor}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Foreground="{StaticResource LightTextColor}" 
+                                           Text="{Binding OriginalName}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsReplaced}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </DockPanel>
-
-        <!-- Footer buttons -->
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom"
-                    HorizontalAlignment="Right">
-            <Button Command="{Binding FFMpegCommand}"
-                    Content="FFMpeg" />
-            <Button Command="{Binding RenameCommand}"
-                    Margin="8,0,0,0"
-                    Content="이름 변경"/>
-        </StackPanel>
-        
-        <!-- Regex input form -->
-        <StackPanel DockPanel.Dock="Bottom">
-            <TextBox Margin="0,0,0,8" 
-                     Text="{Binding TargetRegex}"
-                     md:HintAssist.Hint="대상 파일명 정규식..."/>
-            <TextBox Margin="0,0,0,8"
-                     Text="{Binding ReplacementRegex}"
-                     md:HintAssist.Hint="바꿀 파일명 정규식..."/>
-        </StackPanel>
-
-        <!-- Preview of replacements -->
-        <ListBox Margin="0,8"
-                 BorderBrush="{StaticResource TextColor}"
-                 BorderThickness="1"
-                 ItemsSource="{Binding Files}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <DockPanel>
-                        <md:PackIcon DockPanel.Dock="Left"
-                                     VerticalAlignment="Center"
-                                     Width="24" Height="24"
-                                     Margin="0,0,8,0"
-                                     Kind="{Binding TypeIcon}" />
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock FontWeight="Bold"
-                                       Text="{Binding ReplacedName}">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="{StaticResource HeaderTextColor}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsReplaced}" Value="True">
-                                                <Setter Property="Foreground" Value="{StaticResource ErrorColor}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                            <TextBlock Foreground="{StaticResource LightTextColor}" 
-                                       Text="{Binding OriginalName}">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsReplaced}" Value="True">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </StackPanel>
-                    </DockPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-    </DockPanel>
+    </md:DialogHost>
 </Window>

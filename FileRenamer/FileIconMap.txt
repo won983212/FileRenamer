@@ -1,0 +1,86 @@
+﻿# Directory
+@FolderOutline
+Directory
+
+# Document File
+@FileDocumentOutline
+.txt
+.doc
+.docx
+.odt
+
+# Code File
+@FileCodeOutline
+.c
+.html
+.htm
+.java
+.json
+
+# Zip file
+@ZipBoxOutline
+.zip
+.tar
+.7z
+
+# Presentation File
+@FilePowerpointOutline
+.ppt
+.pptx
+
+# SpreadSheet File
+@FileTableOutline
+.xlsx
+.xls
+.ods
+.csv
+
+# Music File
+@FileMusicOutline
+.mp3
+.aiff
+.aif
+.au
+.mid
+.midi
+.wav
+.m4a
+.flac
+.wma
+.aac
+
+# Image File
+@FileImageOutline
+.jpg
+.jpeg
+.bmp
+.gif
+.mac
+.png
+.tif
+.tiff
+.eps
+
+# Video File
+@FileVideoOutline
+.avi
+.mov
+.qt
+.mp4
+.wmv
+.avchd
+.flv
+.f4v
+.swf
+.mkv
+.webm
+
+# PDF File
+@FilePdfOutline
+.pdf
+
+# Config File
+@FileCogOutline
+.cfg
+.config
+.properties
